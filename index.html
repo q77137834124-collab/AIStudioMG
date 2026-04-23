@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="color-scheme" content="dark">
-    <title>AI Studio v14.0 - 终极跨端满配版</title>
+    <title>AI Studio v15.0 - 终极修复版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
         :root {
-            --safe-top: max(1.5rem, env(safe-area-inset-top));
+            --safe-top: max(2.5rem, env(safe-area-inset-top));
             --safe-bottom: env(safe-area-inset-bottom);
             color-scheme: dark;
         }
@@ -20,8 +20,7 @@
             font-family: 'Inter', system-ui, sans-serif;
             background-color: #09090b; 
             color: #f8fafc;
-            /* 使用 dvh 解决移动端地址栏遮挡高度的顽疾 */
-            height: 100dvh;
+            height: 100dvh; /* 适配移动端高度 */
             overflow: hidden;
             -webkit-tap-highlight-color: transparent; 
         }
@@ -51,24 +50,24 @@
         }
         .save-hint { animation: bounce-subtle 2s infinite; }
 
-        /* 实体标签样式：@图片 按钮 */
+        /* 实体标签：@图片 视觉高亮按钮 */
         .mention-tag {
             display: inline-flex;
             align-items: center;
             background-color: #1d4ed8; 
             color: #ffffff;
-            padding: 1px 6px;
+            padding: 2px 8px;
             border-radius: 6px;
             font-size: 14px;
-            font-weight: bold;
-            margin: 0 2px;
+            font-weight: 700;
+            margin: 0 4px;
             user-select: none;
             cursor: default;
             vertical-align: baseline;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* 富文本编辑器占位符 */
         #promptInput:empty:before {
             content: attr(data-placeholder);
             color: #64748b;
@@ -81,11 +80,9 @@
     <div class="app-sandbox w-full max-w-4xl relative border-x border-white/5 overflow-hidden">
 
         <input type="file" id="globalFileInput" class="hidden" accept="image/*" multiple onchange="handleFiles(this)">
-        
-        <!-- 全局遮罩：用于点击外部关闭下拉菜单 -->
         <div id="dropdownOverlay" onclick="closeAllDropdowns()" class="hidden absolute inset-0 z-40"></div>
 
-        <!-- 顶部导航 -->
+        <!-- 导航栏 -->
         <header class="header-bg border-b border-white/5 shrink-0 z-40">
             <div class="h-14 flex items-center justify-between px-4">
                 <div class="flex items-center gap-2">
@@ -94,7 +91,7 @@
                     </div>
                     <span class="font-bold text-base tracking-tight flex items-center gap-2">
                         AI Studio 
-                        <span class="text-[10px] font-normal text-slate-400 border border-slate-700 px-1.5 py-0.5 rounded bg-slate-800/50">v14.0</span>
+                        <span class="text-[10px] font-normal text-slate-400 border border-slate-700 px-1.5 py-0.5 rounded bg-slate-800/50">v15.0</span>
                     </span>
                 </div>
                 <div class="flex items-center gap-1">
@@ -111,16 +108,15 @@
         <main class="flex-1 flex flex-col overflow-hidden relative">
             <div id="sidebarOverlay" onclick="closeAllSidebars()" class="hidden absolute inset-0 bg-black/80 backdrop-blur-md z-[55] transition-opacity opacity-0"></div>
 
-            <!-- 中心渲染区 -->
+            <!-- 画布中心 -->
             <div class="flex-1 flex flex-col p-4 relative overflow-hidden">
-                <!-- 空状态 -->
-                <div id="emptyState" class="m-auto flex flex-col items-center opacity-20 pointer-events-none">
+                <div id="emptyState" class="m-auto flex flex-col items-center opacity-20 pointer-events-none text-center">
                     <i data-lucide="ghost" class="w-16 h-16 mb-4"></i>
                     <p class="text-[10px] font-bold uppercase tracking-[0.2em]">等待灵感降临</p>
                 </div>
 
-                <!-- 进度条日志 -->
-                <div id="loadingState" class="hidden m-auto flex flex-col items-center w-full max-w-xs px-2 text-center">
+                <!-- 进度条 -->
+                <div id="loadingState" class="hidden m-auto flex flex-col items-center w-full max-w-xs px-2 text-center animate-in fade-in">
                     <div class="relative w-14 h-14 mb-6">
                         <div class="absolute inset-0 border-4 border-blue-500/20 rounded-full"></div>
                         <div class="absolute inset-0 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
@@ -128,16 +124,15 @@
                     </div>
                     <div class="w-full">
                         <div class="flex justify-between items-end text-[11px] text-slate-400 mb-2">
-                            <span id="logText">正在连接服务器...</span>
+                            <span id="logText">正在请求核心渲染...</span>
                             <span id="progressPercent" class="font-mono text-blue-400 font-bold">0%</span>
                         </div>
-                        <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden shadow-inner">
-                            <div id="progressBar" class="h-full bg-blue-500 w-0 transition-all duration-[800ms] relative"></div>
+                        <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden shadow-inner border border-white/5">
+                            <div id="progressBar" class="h-full bg-blue-500 w-0 transition-all duration-[800ms] relative shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 结果展示 -->
                 <div id="resultContainer" class="hidden m-auto w-full flex flex-col items-center animate-in fade-in zoom-in duration-300">
                     <div class="relative w-full max-w-lg bg-[#1e1e22] rounded-2xl p-1 border border-white/5 shadow-2xl overflow-hidden">
                         <button onclick="closeCanvas()" class="absolute top-3 right-3 z-30 p-2 bg-black/50 hover:bg-black/80 text-white rounded-full backdrop-blur-md border border-white/10 active:scale-90 transition">
@@ -163,7 +158,7 @@
                 </div>
             </div>
 
-            <!-- 历史记录瀑布流 -->
+            <!-- 侧边栏 -->
             <aside id="historySidebar" class="absolute inset-y-0 right-0 w-[280px] bg-[#131315] z-[60] transition-transform translate-x-full border-l border-white/10 flex flex-col shadow-2xl">
                 <div class="pt-[calc(var(--safe-top)+1rem)] px-4 pb-4 border-b border-white/5 flex justify-between items-center bg-white/5">
                     <button onclick="closeAllSidebars()" class="p-2 text-slate-400 active:text-white rounded-lg"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
@@ -174,43 +169,39 @@
             </aside>
         </main>
 
-        <!-- 底部控制区 -->
+        <!-- 底部控制 -->
         <div class="safe-bottom bg-[#131315] px-3 py-2 w-full shrink-0 z-50 pb-[calc(var(--safe-bottom)+1.25rem)]">
             <div class="bg-[#202024] rounded-3xl p-2.5 flex flex-col transition-all border border-white/5 shadow-sm">
                 
-                <!-- 上传图片缩略图 -->
                 <div id="uploadPreviewsContainer" class="hidden relative self-start ml-2 mt-1 mb-1 flex flex-wrap gap-3"></div>
 
-                <!-- 文本输入区 -->
                 <div class="relative w-full">
-                    <div id="mentionMenu" class="hidden absolute w-48 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl flex flex-col overflow-hidden z-[70] origin-bottom-left"></div>
+                    <div id="mentionMenu" class="hidden absolute w-48 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl flex flex-col overflow-hidden z-[70] origin-bottom-left animate-in fade-in zoom-in-95"></div>
                     <div id="promptInput" contenteditable="true" 
                          data-placeholder="发送指令至 AI Studio... (@ 引用图)"
                          onkeydown="handleKeydown(event)" 
                          oninput="handleInput(this)" 
                          onpaste="handlePaste(event)"
-                         class="w-full bg-transparent border-none px-3 py-2.5 text-[15px] text-slate-100 outline-none min-h-[44px] max-h-32 overflow-y-auto custom-scrollbar leading-normal break-words relative z-10"></div>
+                         class="w-full bg-transparent border-none px-3 py-2 text-[15px] text-slate-100 outline-none min-h-[44px] max-h-32 overflow-y-auto custom-scrollbar leading-normal break-words relative z-10"></div>
                 </div>
 
                 <div class="flex items-center justify-between px-1 mt-1 gap-1">
-                    <div class="flex items-center gap-1 shrink-0">
-                        <button onclick="document.getElementById('globalFileInput').click()" class="p-2 text-slate-400 active:text-white rounded-full active:bg-white/10 transition">
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="document.getElementById('globalFileInput').click()" class="p-2 text-slate-400 active:text-white rounded-full active:bg-white/10">
                             <i data-lucide="plus" class="w-6 h-6"></i>
                         </button>
 
-                        <!-- 模型 -->
                         <div class="relative">
                             <button onclick="toggleDropdown(event, 'modelDropdown')" class="px-2.5 py-1.5 bg-[#2f2f35] rounded-full flex items-center justify-center border border-white/5">
-                                <span id="modelDisplayLabel" class="text-[10px] font-bold text-blue-400 uppercase">GPT-IMAGE-2</span>
+                                <span id="modelDisplayLabel" class="text-[10px] font-bold text-blue-400 uppercase tracking-tighter">GPT-IMAGE-2</span>
                             </button>
                             <div id="modelDropdown" class="hidden absolute bottom-full mb-3 left-0 w-36 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[60]">
-                                <button onclick="setGlobalModel('gpt-image-2')" class="px-4 py-3.5 text-xs font-bold text-slate-200 text-left hover:bg-white/5 transition">GPT-IMAGE-2</button>
+                                <button onclick="setGlobalModel('gpt-image-2')" class="px-4 py-3.5 text-xs font-bold text-slate-200 text-left hover:bg-white/5 transition uppercase">gpt-image-2</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 参数选项组 -->
-                    <div class="flex items-center gap-1">
+                    <div class="flex items-center gap-1 overflow-visible">
                         <!-- 模式 -->
                         <div class="relative">
                             <button onclick="toggleDropdown(event, 'modeDropdown')" class="px-2.5 py-1.5 bg-[#2f2f35] rounded-full flex items-center justify-center border border-white/5">
@@ -219,7 +210,7 @@
                             <div id="modeDropdown" class="hidden absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-44 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl z-[60]">
                                 <button onclick="setMode('generations')" class="px-4 py-3 text-left hover:bg-white/5 transition flex flex-col">
                                     <span class="text-xs font-bold text-slate-100">生成模式</span>
-                                    <span class="text-[9px] text-slate-400">文生图、多图融合</span>
+                                    <span class="text-[9px] text-slate-400">纯创作或多图参考融合</span>
                                 </button>
                                 <div class="h-[1px] bg-white/5"></div>
                                 <button onclick="setMode('edits')" class="px-4 py-3 text-left hover:bg-white/5 transition flex flex-col">
@@ -258,20 +249,20 @@
                             <button onclick="toggleDropdown(event, 'ratioDropdown')" class="px-2.5 py-1.5 bg-[#2f2f35] rounded-full flex items-center justify-center border border-white/5">
                                 <span id="ratioDisplayLabel" class="text-[10px] font-medium text-slate-300">自动</span>
                             </button>
-                            <div id="ratioDropdown" class="hidden absolute bottom-full mb-3 right-0 w-28 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden z-[60] origin-bottom-right">
-                                <button onclick="setRatio('auto')" class="py-2.5 text-xs text-slate-200 hover:bg-white/5 w-full border-b border-white/5">自动感应</button>
+                            <div id="ratioDropdown" class="hidden absolute bottom-full mb-3 right-0 w-32 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden z-[60] origin-bottom-right">
+                                <button onclick="setRatio('auto')" class="py-3 text-xs text-slate-200 hover:bg-white/5 w-full border-b border-white/5 font-bold">自动识别</button>
                                 <div class="grid grid-cols-2">
-                                    <button onclick="setRatio('1:1')" class="py-2.5 text-xs text-slate-200 hover:bg-white/5 border-r border-b border-white/5">1:1</button>
-                                    <button onclick="setRatio('16:9')" class="py-2.5 text-xs text-slate-200 hover:bg-white/5 border-b border-white/5">16:9</button>
-                                    <button onclick="setRatio('3:2')" class="py-2.5 text-xs text-slate-200 hover:bg-white/5 border-r border-b border-white/5">3:2</button>
-                                    <button onclick="setRatio('2:3')" class="py-2.5 text-xs text-slate-200 hover:bg-white/5 border-b border-white/5">2:3</button>
-                                    <button onclick="setRatio('4:3')" class="py-2.5 text-xs text-slate-200 hover:bg-white/5 border-r border-white/5">4:3</button>
-                                    <button onclick="setRatio('9:16')" class="py-2.5 text-xs text-slate-200 hover:bg-white/5">9:16</button>
+                                    <button onclick="setRatio('1:1')" class="py-3 text-xs text-slate-200 hover:bg-white/5 border-r border-b border-white/5">1:1</button>
+                                    <button onclick="setRatio('16:9')" class="py-3 text-xs text-slate-200 hover:bg-white/5 border-b border-white/5">16:9</button>
+                                    <button onclick="setRatio('3:2')" class="py-3 text-xs text-slate-200 hover:bg-white/5 border-r border-b border-white/5">3:2</button>
+                                    <button onclick="setRatio('2:3')" class="py-3 text-xs text-slate-200 hover:bg-white/5 border-b border-white/5 font-bold text-blue-400">2:3</button>
+                                    <button onclick="setRatio('4:3')" class="py-3 text-xs text-slate-200 hover:bg-white/5 border-r border-white/5">4:3</button>
+                                    <button onclick="setRatio('9:16')" class="py-3 text-xs text-slate-200 hover:bg-white/5 font-bold text-blue-400">9:16</button>
                                 </div>
                             </div>
                         </div>
 
-                        <button onclick="generate()" class="w-10 h-10 bg-blue-600 active:bg-blue-700 rounded-full flex items-center justify-center transition-all active:scale-90 text-white shrink-0">
+                        <button onclick="generate()" class="w-10 h-10 bg-blue-600 hover:bg-blue-500 active:scale-90 rounded-full flex items-center justify-center transition-all text-white shrink-0 shadow-lg shadow-blue-600/20">
                             <i data-lucide="send" class="w-4 h-4 ml-0.5"></i>
                         </button>
                     </div>
@@ -281,53 +272,53 @@
 
         <!-- 模态框：设置 -->
         <div id="configModal" class="hidden absolute inset-0 z-[100] flex items-center justify-center bg-black/95 p-6">
-            <div class="w-full max-w-sm bg-[#1e1e22] border border-white/10 rounded-3xl p-6 shadow-2xl">
+            <div class="w-full max-w-sm bg-[#1e1e22] border border-white/10 rounded-3xl p-6 shadow-2xl animate-in zoom-in-95">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="font-bold">接口配置</h2>
                     <button onclick="toggleConfig()" class="text-slate-400"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
                 <div class="space-y-4">
-                    <input id="apiUrl" type="text" placeholder="API 地址" class="w-full bg-[#131315] border border-white/5 rounded-xl p-4 text-sm outline-none text-white">
-                    <input id="apiKey" type="password" placeholder="API Key" class="w-full bg-[#131315] border border-white/5 rounded-xl p-4 text-sm outline-none text-white">
+                    <input id="apiUrl" type="text" placeholder="API 地址 (例如 https://ai.xxx.com)" class="w-full bg-[#131315] border border-white/5 rounded-xl p-4 text-sm outline-none text-white focus:border-blue-500/50 transition">
+                    <input id="apiKey" type="password" placeholder="API Key" class="w-full bg-[#131315] border border-white/5 rounded-xl p-4 text-sm outline-none text-white focus:border-blue-500/50 transition">
                     
                     <div class="px-1 flex justify-between items-center bg-white/5 p-4 rounded-xl border border-white/5">
-                        <span class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">密钥渠道:</span>
+                        <span class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">获取渠道:</span>
                         <a href="https://ai.comfly.chat/register?aff=K4nM122020" target="_blank" class="text-[11px] text-blue-400 font-bold hover:underline flex items-center gap-1">
-                            点此注册获取 <i data-lucide="external-link" class="w-3 h-3"></i>
+                            点击此处获取密钥 <i data-lucide="external-link" class="w-3 h-3"></i>
                         </a>
                     </div>
 
                     <div class="flex gap-2 pt-2">
                         <button id="verifyBtn" onclick="verifyApiKey()" class="flex-1 bg-[#2a2a30] py-4 rounded-xl font-bold text-sm border border-white/5 active:scale-95 transition">测试接口</button>
-                        <button onclick="saveConfig()" class="flex-1 bg-blue-600 py-4 rounded-xl font-bold text-sm active:scale-95 transition">保存配置</button>
+                        <button onclick="saveConfig()" class="flex-1 bg-blue-600 py-4 rounded-xl font-bold text-sm active:scale-95 transition shadow-lg shadow-blue-600/20">保存配置</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 模态框：保存预览 -->
-        <div id="saveModal" class="hidden absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black/95 p-6">
+        <!-- 模态框：保存 -->
+        <div id="saveModal" class="hidden absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black/95 p-6 animate-in fade-in">
             <button onclick="closeSaveModal()" class="absolute top-[var(--safe-top)] right-6 p-3 bg-white/10 rounded-full text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
             <div class="relative max-w-full max-h-[60dvh] bg-[#1e1e22] p-1 rounded-2xl shadow-2xl border border-white/10 mb-6">
                 <img id="savePreview" src="" class="max-w-full max-h-[55dvh] rounded-xl object-contain">
             </div>
             <button onclick="window.open(document.getElementById('savePreview').src, '_blank')" class="w-full max-w-xs flex items-center justify-center gap-2 py-4 bg-slate-800 text-slate-200 rounded-2xl font-bold active:scale-95 transition border border-white/10">
                 <i data-lucide="external-link" class="w-5 h-5"></i>
-                🌐 新标签打开原图 (用于保存)
+                🌐 在新标签页打开原图 (保存无忧)
             </button>
         </div>
 
-        <!-- 模态框：历史预览 -->
+        <!-- 模态框：历史详情 -->
         <div id="historyViewModal" class="hidden absolute inset-0 z-[120] flex flex-col items-center justify-center bg-black/95 p-4 animate-in fade-in">
             <button onclick="closeHistoryView()" class="absolute top-[var(--safe-top)] right-4 p-3 bg-white/10 rounded-full text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
             <img id="historyViewImg" src="" class="max-w-full max-h-[50dvh] rounded-2xl shadow-2xl mb-4 object-contain">
             <div class="w-full max-w-xs flex flex-col gap-2">
-                <div id="historyViewPrompt" class="bg-[#1e1e22]/80 p-3 rounded-xl border border-white/10 max-h-24 overflow-y-auto custom-scrollbar text-[11px] text-slate-300 leading-relaxed"></div>
+                <div id="historyViewPrompt" class="bg-[#1e1e22]/80 p-4 rounded-xl border border-white/10 max-h-24 overflow-y-auto custom-scrollbar text-[11px] text-slate-300 leading-relaxed shadow-inner"></div>
                 <div class="flex gap-2 mt-1">
-                    <button onclick="reuseHistoryPromptOnly()" class="flex-1 py-3 bg-[#2a2a30] text-slate-300 rounded-xl font-bold text-xs active:scale-95 transition">提词</button>
-                    <button id="reuseImageBtn" onclick="reuseHistoryImageOnly()" class="flex-1 py-3 bg-[#2a2a30] text-slate-300 rounded-xl font-bold text-xs active:scale-95 transition">底图</button>
+                    <button onclick="reuseHistoryPromptOnly()" class="flex-1 py-3 bg-[#2a2a30] text-slate-300 rounded-xl font-bold text-xs active:scale-95 transition">复用文字</button>
+                    <button id="reuseImageBtn" onclick="reuseHistoryImageOnly()" class="flex-1 py-3 bg-[#2a2a30] text-slate-300 rounded-xl font-bold text-xs active:scale-95 transition">设为参考图</button>
                 </div>
-                <button id="reuseAllBtn" onclick="reuseHistoryAll()" class="w-full py-3.5 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg active:scale-95 transition">完整套用</button>
+                <button id="reuseAllBtn" onclick="reuseHistoryAll()" class="w-full py-3.5 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg active:scale-95 transition">完整套用 (图+词)</button>
             </div>
         </div>
 
@@ -350,7 +341,7 @@
         let currentResultUrls = [];
         let progressInterval = null;
 
-        // 富文本编辑器
+        // 富文本逻辑
         function getPromptText() {
             const el = document.getElementById('promptInput');
             if(!el) return '';
@@ -373,9 +364,7 @@
             document.execCommand('insertText', false, text);
         }
 
-        function handleKeydown(e) { 
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); generate(); } 
-        }
+        function handleKeydown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); generate(); } }
 
         function handleInput(el) {
             saveCurrentState();
@@ -383,8 +372,7 @@
             if (!sel.rangeCount) return;
             const range = sel.getRangeAt(0);
             if (range.startContainer.nodeType !== Node.TEXT_NODE) { hideMentionMenu(); return; }
-            const textBeforeCursor = range.startContainer.textContent.substring(0, range.startOffset);
-            const match = textBeforeCursor.match(/(?:^|[\s\u00A0])@([^\s\u00A0]*)$/);
+            const match = range.startContainer.textContent.substring(0, range.startOffset).match(/(?:^|[\s\u00A0])@([^\s\u00A0]*)$/);
             if (match) {
                 const rect = range.getBoundingClientRect();
                 const menu = document.getElementById('mentionMenu');
@@ -399,7 +387,7 @@
             const menu = document.getElementById('mentionMenu');
             menu.innerHTML = '';
             if (uploadedImagesBase64.length === 0) {
-                menu.innerHTML = `<div class="px-3 py-4 text-xs text-slate-500 text-center font-bold">需先上传图片</div>`;
+                menu.innerHTML = `<div class="px-3 py-4 text-xs text-slate-500 text-center font-bold">请先添加图片</div>`;
             } else {
                 uploadedImagesBase64.forEach((_, idx) => {
                     const num = idx + 1;
@@ -416,8 +404,7 @@
             if (!sel.rangeCount) return;
             const range = sel.getRangeAt(0);
             const textNode = range.startContainer;
-            const textBeforeCursor = textNode.textContent.substring(0, range.startOffset);
-            const match = textBeforeCursor.match(/(?:^|[\s\u00A0])@([^\s\u00A0]*)$/);
+            const match = textNode.textContent.substring(0, range.startOffset).match(/(?:^|[\s\u00A0])@([^\s\u00A0]*)$/);
             if (match) {
                 const startIndex = range.startOffset - match[0].length + match[0].indexOf('@');
                 const replaceRange = document.createRange();
@@ -429,7 +416,7 @@
             hideMentionMenu(); saveCurrentState(); document.getElementById('promptInput').focus();
         }
 
-        // 下拉菜单控制
+        // 下拉菜单控制 (彻底重写防失效)
         function toggleDropdown(event, id) {
             event.stopPropagation();
             const el = document.getElementById(id);
@@ -449,7 +436,7 @@
             document.getElementById('dropdownOverlay').classList.add('hidden');
         }
 
-        // 状态更新器
+        // 状态设置
         function setGlobalModel(m) {
             currentModel = m;
             const el = document.getElementById('modelDisplayLabel');
@@ -498,11 +485,8 @@
             btn.disabled = true; btn.innerText = "验证中...";
             try {
                 const res = await fetch(`${url}/v1/models`, { headers: { 'Authorization': `Bearer ${key}` } });
-                if (res.ok) { 
-                    showToast("✅ 验证成功并保存"); 
-                    localStorage.setItem('ai_base_url', url); 
-                    localStorage.setItem('ai_api_key', key); 
-                } else { showToast("❌ 鉴权失败，请检查 Key"); }
+                if (res.ok) { showToast("✅ 验证成功并已保存"); localStorage.setItem('ai_base_url', url); localStorage.setItem('ai_api_key', key); }
+                else { showToast("❌ 鉴权失败，请检查 Key"); }
             } catch (e) { showToast("❌ 网络连接失败"); }
             finally { btn.disabled = false; btn.innerText = "测试接口"; }
         }
@@ -510,7 +494,7 @@
         function handleFiles(input) {
             const files = Array.from(input.files);
             const canAdd = MAX_UPLOADS - uploadedImagesBase64.length;
-            if (files.length > canAdd) showToast(`⚠️ 还能添加 ${canAdd} 张图`);
+            if (files.length > canAdd) showToast(`⚠️ 本次只能添加 ${canAdd} 张图`);
             files.slice(0, canAdd).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = (e) => { uploadedImagesBase64.push(e.target.result); renderUploadPreviews(); };
@@ -538,7 +522,7 @@
             if (uploadedImagesBase64.length === 0) { container.classList.add('hidden'); return; }
             container.classList.remove('hidden');
             uploadedImagesBase64.forEach((img, idx) => {
-                container.innerHTML += `<div class="relative inline-block animate-in fade-in zoom-in-75"><div class="absolute -top-1.5 -left-1.5 bg-blue-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-white/20 shadow-md z-10">${idx+1}</div><img src="${img}" class="w-12 h-12 object-cover rounded-lg border border-white/10 shadow-sm"><button onclick="removeUpload(${idx})" class="absolute -top-1.5 -right-1.5 bg-[#3f3f46] rounded-full p-0.5 z-10 border border-white/5"><i data-lucide="x" class="w-3 h-3 text-white"></i></button></div>`;
+                container.innerHTML += `<div class="relative inline-block animate-in fade-in zoom-in-75 shadow-lg"><div class="absolute -top-1.5 -left-1.5 bg-blue-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-white/20 z-10">${idx+1}</div><img src="${img}" class="w-12 h-12 object-cover rounded-lg border border-white/10 shadow-sm"><button onclick="removeUpload(${idx})" class="absolute -top-1.5 -right-1.5 bg-[#3f3f46] rounded-full p-0.5 z-10 border border-white/5"><i data-lucide="x" class="w-3 h-3 text-white"></i></button></div>`;
             });
             lucide.createIcons();
         }
@@ -548,21 +532,22 @@
             list.innerHTML = '';
             historyQueue.forEach(item => {
                 const div = document.createElement('div');
-                div.className = "break-inside-avoid inline-block w-full mb-2 rounded-xl border border-white/5 overflow-hidden active:scale-95 transition cursor-pointer relative group bg-white/5 shadow-sm";
+                div.className = "break-inside-avoid inline-block w-full mb-2 rounded-xl border border-white/5 overflow-hidden active:scale-95 transition cursor-pointer relative group bg-white/5 shadow-md";
                 div.onclick = () => openHistoryView(item.url, item.prompt);
                 let dp = (item.prompt || '').replace(/@图片(\d+)/g, '<span class="bg-blue-600 px-1 rounded text-white font-bold text-[8px] mx-0.5">@图$1</span>');
-                div.innerHTML = `<img src="${item.url}" class="w-full object-cover"><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent opacity-0 group-hover:opacity-100 transition p-2 flex items-end"><p class="text-[9px] text-slate-200 line-clamp-2">${dp}</p></div>`;
+                div.innerHTML = `<img src="${item.url}" class="w-full object-cover"><div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent opacity-0 group-hover:opacity-100 transition p-2 flex items-end"><p class="text-[9px] text-slate-200 line-clamp-2">${dp}</p></div>`;
                 list.appendChild(div);
             });
         }
 
+        // 核心请求逻辑
         async function generate() {
             const prompt = getPromptText();
             const baseUrl = document.getElementById('apiUrl').value.trim() || localStorage.getItem('ai_base_url');
             const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('ai_api_key');
             if (!prompt) return showToast("请输入创作指令");
             if (!apiKey) return toggleConfig();
-            if (currentMode === 'edits' && uploadedImagesBase64.length === 0) return showToast("⚠️ 编辑模式需底图参考");
+            if (currentMode === 'edits' && uploadedImagesBase64.length === 0) return showToast("⚠️ 编辑模式需原图");
 
             document.getElementById('promptInput').blur();
             document.getElementById('emptyState').classList.add('hidden');
@@ -576,9 +561,10 @@
             progressInterval = setInterval(() => {
                 p += (p < 90 ? Math.random() * 5 : 0.05); if(p > 99) p = 99;
                 bar.style.width = p + '%'; pct.innerText = Math.floor(p) + '%';
-                log.innerText = p < 30 ? "正在握手服务器..." : p < 70 ? "正在解析多图与指令..." : "渲染最终细节中...";
+                log.innerText = p < 30 ? "握手服务器..." : p < 70 ? "解析指令与图像矩阵..." : "正在渲染最终画质...";
             }, 800);
 
+            // 分辨率映射 (严格16倍数)
             const sizeMap = {
                 "1K": { "auto": "auto", "1:1": "1024x1024", "3:2": "1216x816",  "2:3": "816x1216",  "16:9": "1344x752",  "9:16": "752x1344", "4:3": "1152x864" },
                 "2K": { "auto": "auto", "1:1": "2048x2048", "3:2": "2448x1632", "2:3": "1632x2448", "16:9": "2688x1520", "9:16": "1520x2688", "4:3": "2304x1728" },
@@ -592,16 +578,28 @@
                     let options = { method: 'POST', headers: { 'Authorization': `Bearer ${apiKey}` } };
                     if (currentMode === 'edits') {
                         const fd = new FormData();
-                        fd.append('model', currentModel); fd.append('prompt', prompt); fd.append('size', mappedSize);
+                        fd.append('model', currentModel); 
+                        fd.append('prompt', prompt); 
+                        fd.append('size', mappedSize);
+                        fd.append('response_format', 'url'); // 必填参数修复
                         uploadedImagesBase64.forEach((b, i) => fd.append('image', dataURLtoBlob(b), `ref_${i}.png`));
                         options.body = fd;
                     } else {
                         options.headers['Content-Type'] = 'application/json';
-                        options.body = JSON.stringify({ model: currentModel, prompt, size: mappedSize, image: uploadedImagesBase64 });
+                        options.body = JSON.stringify({ 
+                            model: currentModel, 
+                            prompt, 
+                            size: mappedSize, 
+                            image: uploadedImagesBase64,
+                            response_format: 'url' // 必填参数修复
+                        });
                     }
                     const res = await fetch(`${baseUrl.replace(/\/$/, '')}${endpoint}`, options);
-                    const dt = await res.json(); if (!res.ok) throw new Error(dt.error?.message || "生成失败");
-                    return dt;
+                    if (!res.ok) {
+                        const errBody = await res.json().catch(() => ({}));
+                        throw new Error(errBody.error?.message || `服务器返回了错误 ${res.status}`);
+                    }
+                    return await res.json();
                 };
 
                 const tasks = Array(parseInt(currentBatch)).fill(0).map(() => makeRequest());
@@ -621,7 +619,7 @@
                     document.getElementById('loadingState').classList.add('hidden');
                     document.getElementById('resultContainer').classList.remove('hidden');
                     const btnTxt = document.getElementById('saveBtnText');
-                    if(btnTxt) btnTxt.innerText = urls.length > 1 ? `保存全部(${urls.length})` : "保存画作";
+                    if(btnTxt) btnTxt.innerText = urls.length > 1 ? `全部保存(${urls.length})` : "保存画作";
                 }, 400);
 
                 urls.forEach(u => addToHistory(u, prompt));
@@ -648,8 +646,8 @@
         }
 
         function saveCurrentState() { localStorage.setItem('ai_last_prompt', getPromptText()); }
-        function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.remove('-translate-y-20', 'opacity-0'); setTimeout(() => t.classList.add('-translate-y-20', 'opacity-0'), 3000); }
-        function saveConfig() { localStorage.setItem('ai_base_url', document.getElementById('apiUrl').value.trim()); localStorage.setItem('ai_api_key', document.getElementById('apiKey').value.trim()); toggleConfig(); showToast("✅ 配置已保存"); }
+        function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.remove('-translate-y-20', 'opacity-0'); setTimeout(() => t.classList.add('-translate-y-20', 'opacity-0'), 4000); }
+        function saveConfig() { localStorage.setItem('ai_base_url', document.getElementById('apiUrl').value.trim()); localStorage.setItem('ai_api_key', document.getElementById('apiKey').value.trim()); toggleConfig(); showToast("✅ 配置已保存并持久化"); }
         function toggleConfig() { document.getElementById('configModal').classList.toggle('hidden'); closeAllDropdowns(); }
         function toggleSidebar(id) { document.getElementById(id).classList.toggle('translate-x-full'); document.getElementById('sidebarOverlay').classList.toggle('hidden'); setTimeout(() => document.getElementById('sidebarOverlay').classList.toggle('opacity-100'), 10); }
         function closeAllSidebars() { document.getElementById('historySidebar').classList.add('translate-x-full'); document.getElementById('sidebarOverlay').classList.add('hidden'); document.getElementById('sidebarOverlay').classList.remove('opacity-100'); }
@@ -663,12 +661,12 @@
             document.getElementById('historyViewModal').classList.remove('hidden');
         }
         function closeHistoryView() { document.getElementById('historyViewModal').classList.add('hidden'); }
-        function reuseHistoryPromptOnly() { setPromptHtml(currentHistoryPromptStr); closeHistoryView(); closeAllSidebars(); showToast("文字已提取"); }
-        async function reuseHistoryImageOnly() { try { const response = await fetch(document.getElementById('historyViewImg').src); const blob = await response.blob(); const reader = new FileReader(); reader.onload = (e) => { uploadedImagesBase64 = [e.target.result]; renderUploadPreviews(); closeHistoryView(); closeAllSidebars(); showToast("已设为底图"); }; reader.readAsDataURL(blob); } catch(e) { showToast("跨域限制，请手动上传"); } }
+        function reuseHistoryPromptOnly() { setPromptHtml(currentHistoryPromptStr); closeHistoryView(); closeAllSidebars(); showToast("文字描述已复刻"); }
+        async function reuseHistoryImageOnly() { try { const response = await fetch(document.getElementById('historyViewImg').src); const blob = await response.blob(); const reader = new FileReader(); reader.onload = (e) => { uploadedImagesBase64 = [e.target.result]; renderUploadPreviews(); closeHistoryView(); closeAllSidebars(); showToast("已设为参考图底色"); }; reader.readAsDataURL(blob); } catch(e) { showToast("跨域受限，请手动长按保存后再上传"); } }
         async function reuseHistoryAll() { setPromptHtml(currentHistoryPromptStr); await reuseHistoryImageOnly(); }
         function startCompare() { if(uploadedImagesBase64.length===1 && currentResultUrls.length===1) { document.getElementById('compareImg').src = uploadedImagesBase64[0]; document.getElementById('compareOverlay').classList.replace('opacity-0', 'opacity-100'); } }
         function stopCompare() { document.getElementById('compareOverlay').classList.replace('opacity-100', 'opacity-0'); }
-        function clearHistory() { if(confirm("确定清空所有记录？")) { historyQueue=[]; localStorage.removeItem('ai_history'); renderHistory(); } }
+        function clearHistory() { if(confirm("确定清空所有历史记录？")) { historyQueue=[]; localStorage.removeItem('ai_history'); renderHistory(); } }
 
         window.onload = () => {
             const url = localStorage.getItem('ai_base_url') || 'https://ai.comfly.chat';
@@ -683,7 +681,7 @@
             document.getElementById('apiUrl').value = url;
             if(key) document.getElementById('apiKey').value = key;
             if(pr) setPromptHtml(pr);
-            if(hi) { historyQueue = JSON.parse(hi); renderHistory(); }
+            if(hi) { try { historyQueue = JSON.parse(hi); renderHistory(); } catch(e){} }
             setGlobalModel(md);
             setQuality(qt);
             setRatio(ra);
