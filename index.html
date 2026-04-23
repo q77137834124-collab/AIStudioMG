@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="color-scheme" content="dark">
-    <title>AI Studio v10.0 - 终极跨端版</title>
+    <title>AI Studio v11.0 - 终极跨端满配版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
         :root {
-            --safe-top: max(1.5rem, env(safe-area-inset-top));
+            --safe-top: max(2.5rem, env(safe-area-inset-top));
             --safe-bottom: env(safe-area-inset-bottom);
             color-scheme: dark;
         }
@@ -20,7 +20,7 @@
             font-family: 'Inter', system-ui, sans-serif;
             background-color: #09090b; 
             color: #f8fafc;
-            /* 【修复】：使用 dvh 动态视口高度，解决移动端浏览器遮挡问题 */
+            /* 解决移动端地址栏遮挡的核心：dvh */
             height: 100dvh;
             overflow: hidden;
             -webkit-tap-highlight-color: transparent; 
@@ -29,18 +29,13 @@
         .app-sandbox {
             background-color: #131315;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-            height: 100dvh; /* 撑满动态高度 */
+            height: 100dvh; 
         }
 
         .header-bg {
             background: rgba(19, 19, 21, 0.9);
             backdrop-filter: blur(20px);
             padding-top: var(--safe-top);
-        }
-
-        #mainResult {
-            max-height: calc(100dvh - 320px - var(--safe-top));
-            object-fit: contain;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -54,7 +49,7 @@
         }
         .save-hint { animation: bounce-subtle 2s infinite; }
 
-        /* 高亮标签样式 */
+        /* 实体化标签：@图片 按钮样式 */
         .mention-tag {
             display: inline-flex;
             align-items: center;
@@ -63,7 +58,7 @@
             padding: 1px 6px;
             border-radius: 6px;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: bold;
             margin: 0 2px;
             user-select: none;
             cursor: default;
@@ -79,7 +74,7 @@
         <input type="file" id="globalFileInput" class="hidden" accept="image/*" multiple onchange="handleFiles(this)">
         <div id="dropdownOverlay" onclick="closeAllDropdowns()" class="hidden absolute inset-0 z-40"></div>
 
-        <!-- 顶部导航 -->
+        <!-- 顶部 -->
         <header class="header-bg border-b border-white/5 shrink-0 z-40">
             <div class="h-14 flex items-center justify-between px-4">
                 <div class="flex items-center gap-2">
@@ -88,7 +83,7 @@
                     </div>
                     <span class="font-bold text-base tracking-tight flex items-center gap-2">
                         AI Studio 
-                        <span class="text-[10px] font-normal text-slate-400 border border-slate-700 px-1.5 py-0.5 rounded bg-slate-800/50">v10.0</span>
+                        <span class="text-[10px] font-normal text-slate-400 border border-slate-700 px-1.5 py-0.5 rounded bg-slate-800/50">v11.0</span>
                     </span>
                 </div>
                 <div class="flex items-center gap-1">
@@ -105,7 +100,6 @@
         <main class="flex-1 flex flex-col overflow-hidden relative">
             <div id="sidebarOverlay" onclick="closeAllSidebars()" class="hidden absolute inset-0 bg-black/80 backdrop-blur-md z-[55] transition-opacity opacity-0"></div>
 
-            <!-- 画布区 -->
             <div class="flex-1 flex flex-col p-4 relative overflow-hidden">
                 <div id="emptyState" class="m-auto flex flex-col items-center opacity-20 pointer-events-none">
                     <i data-lucide="ghost" class="w-16 h-16 mb-4"></i>
@@ -134,7 +128,7 @@
                         <button onclick="closeCanvas()" class="absolute top-3 right-3 z-30 p-2 bg-black/50 hover:bg-black/80 text-white rounded-full backdrop-blur-md border border-white/10 active:scale-90 transition shadow-lg">
                             <i data-lucide="x" class="w-4 h-4"></i>
                         </button>
-                        <div id="mainResultGrid" class="w-full max-h-[55dvh] overflow-y-auto custom-scrollbar flex flex-wrap justify-center gap-1.5 p-1"></div>
+                        <div id="mainResultGrid" class="w-full max-h-[50dvh] overflow-y-auto custom-scrollbar flex flex-wrap justify-center gap-1.5 p-1"></div>
                         <div id="compareOverlay" class="absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-200 z-20">
                             <img id="compareImg" src="" class="w-full h-full object-contain rounded-xl bg-black">
                             <div class="absolute top-3 left-3 bg-blue-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase border border-white/20">参考原图</div>
@@ -144,17 +138,16 @@
                     <div class="mt-6 flex items-center gap-3 w-full max-w-xs px-2">
                         <button id="compareBtn" class="hidden flex-1 flex items-center justify-center gap-2 py-3.5 bg-[#2a2a30] text-slate-300 rounded-2xl active:scale-95 transition select-none" ontouchstart="startCompare()" ontouchend="stopCompare()" onmousedown="startCompare()" onmouseup="stopCompare()">
                             <i data-lucide="scan-eye" class="w-5 h-5 text-blue-400"></i>
-                            <span class="text-xs font-bold text-nowrap">对比</span>
+                            <span class="text-xs font-bold">对比</span>
                         </button>
                         <button onclick="openSaveModal()" class="flex-[1.5] flex items-center justify-center gap-2 py-3.5 bg-white text-black rounded-2xl font-bold active:scale-95 transition shadow-lg">
                             <i data-lucide="arrow-down-to-line" class="w-5 h-5"></i>
-                            <span id="saveBtnText" class="text-nowrap">保存画作</span>
+                            <span id="saveBtnText">保存画作</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- 历史边栏 -->
             <aside id="historySidebar" class="absolute inset-y-0 right-0 w-[280px] bg-[#131315] z-[60] transition-transform translate-x-full border-l border-white/10 flex flex-col shadow-2xl">
                 <div class="pt-[calc(var(--safe-top)+1rem)] px-4 pb-4 border-b border-white/5 flex justify-between items-center bg-white/5">
                     <button onclick="closeAllSidebars()" class="p-2 text-slate-400 active:text-white rounded-lg"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
@@ -165,21 +158,21 @@
             </aside>
         </main>
 
-        <!-- 底部栏 -->
-        <div class="safe-bottom bg-[#131315] px-4 py-2 w-full shrink-0 z-50 pb-[calc(var(--safe-bottom)+0.75rem)]">
-            <div class="bg-[#202024] rounded-3xl p-2.5 flex flex-col transition-all border border-white/5 shadow-sm">
+        <!-- 底部输入栏 -->
+        <div class="safe-bottom bg-[#131315] px-3 py-2 w-full shrink-0 z-50 pb-[calc(var(--safe-bottom)+0.75rem)]">
+            <div class="bg-[#202024] rounded-3xl p-2 flex flex-col transition-all border border-white/5 shadow-sm">
                 
                 <div id="uploadPreviewsContainer" class="hidden relative self-start ml-2 mt-1 mb-1 flex flex-wrap gap-3"></div>
 
                 <div class="relative w-full">
-                    <div id="mentionMenu" class="hidden absolute w-40 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden z-[70] origin-bottom-left animate-in fade-in zoom-in-95 duration-100"></div>
+                    <div id="mentionMenu" class="hidden absolute w-44 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden z-[70] origin-bottom-left animate-in fade-in zoom-in-95 duration-100"></div>
                     <div class="relative">
-                        <div id="promptPlaceholder" class="absolute inset-0 px-3 py-2 text-[15px] text-slate-500 pointer-events-none transition-opacity duration-200 whitespace-nowrap overflow-hidden">发送指令... (输入 @ 引用图片)</div>
+                        <div id="promptPlaceholder" class="absolute inset-0 px-3 py-2 text-[14px] text-slate-500 pointer-events-none transition-opacity duration-200 whitespace-nowrap overflow-hidden">发送指令至 AI Studio... (@ 引用)</div>
                         <div id="promptInput" contenteditable="true" 
                              onkeydown="handleKeydown(event)" 
                              oninput="handleInput(this)" 
                              onpaste="handlePaste(event)"
-                             class="w-full bg-transparent border-none px-3 py-2 text-[15px] text-slate-100 outline-none min-h-[40px] max-h-32 overflow-y-auto custom-scrollbar leading-normal break-words relative z-10"></div>
+                             class="w-full bg-transparent border-none px-3 py-2 text-[15px] text-slate-100 outline-none min-h-[44px] max-h-32 overflow-y-auto custom-scrollbar leading-normal break-words relative z-10"></div>
                     </div>
                 </div>
 
@@ -189,15 +182,12 @@
                             <i data-lucide="plus" class="w-6 h-6"></i>
                         </button>
 
-                        <!-- 【新增】：模型选择菜单 -->
                         <div class="relative">
                             <button onclick="toggleDropdown(event, 'modelDropdown')" class="px-2.5 py-1.5 bg-[#2f2f35] rounded-full flex items-center justify-center active:bg-white/10 transition border border-white/5 gap-1.5">
-                                <span id="modelDisplay" class="text-[10px] font-bold text-blue-400">gpt-image-2</span>
+                                <span id="modelDisplay" class="text-[10px] font-bold text-blue-400 uppercase tracking-tighter">gpt-image-2</span>
                             </button>
-                            <div id="modelDropdown" class="hidden absolute bottom-full mb-3 left-0 w-36 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_20px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden z-[60] origin-bottom-left animate-in fade-in zoom-in-95 duration-100">
-                                <button onclick="setGlobalModel('gpt-image-2')" class="px-4 py-3 text-xs font-medium text-slate-200 text-left hover:bg-white/5 active:bg-white/10 transition">gpt-image-2</button>
-                                <div class="h-[1px] bg-white/5"></div>
-                                <button onclick="setGlobalModel('gpt-image-v3')" class="px-4 py-3 text-xs font-medium text-slate-200 text-left hover:bg-white/5 active:bg-white/10 transition">gpt-image-v3 (Beta)</button>
+                            <div id="modelDropdown" class="hidden absolute bottom-full mb-3 left-0 w-36 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[60] origin-bottom-left">
+                                <button onclick="setGlobalModel('gpt-image-2')" class="px-4 py-3.5 text-xs font-bold text-slate-200 text-left hover:bg-white/5 active:bg-white/10 transition">GPT-IMAGE-2</button>
                             </div>
                         </div>
                     </div>
@@ -206,17 +196,17 @@
                         <!-- 模式 -->
                         <div class="relative">
                             <button onclick="toggleDropdown(event, 'modeDropdown')" class="px-2.5 py-1.5 bg-[#2f2f35] rounded-full flex items-center justify-center active:bg-white/10 transition border border-white/5">
-                                <span id="modeDisplay" class="text-[10px] font-medium text-slate-300">生成模式</span>
+                                <span id="modeDisplay" class="text-[10px] font-medium text-slate-300">生成</span>
                             </button>
-                            <div id="modeDropdown" class="hidden absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-44 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_20px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden z-[60] origin-bottom animate-in fade-in zoom-in-95 duration-100">
+                            <div id="modeDropdown" class="hidden absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-44 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl z-[60] origin-bottom animate-in fade-in zoom-in-95">
                                 <button onclick="setMode('generations')" class="px-4 py-3 text-left hover:bg-white/5 active:bg-white/10 transition">
                                     <div class="text-xs font-bold text-slate-200">生成模式</div>
-                                    <div class="text-[9px] text-slate-400">纯创作或多图融合</div>
+                                    <div class="text-[9px] text-slate-400 mt-0.5">纯文生图、多图参考融合</div>
                                 </button>
                                 <div class="h-[1px] bg-white/5"></div>
                                 <button onclick="setMode('edits')" class="px-4 py-3 text-left hover:bg-white/5 active:bg-white/10 transition">
                                     <div class="text-xs font-bold text-slate-200">编辑模式</div>
-                                    <div class="text-[9px] text-slate-400">基于原图进行修改</div>
+                                    <div class="text-[9px] text-slate-400 mt-0.5">基于原图进行局部重绘修改</div>
                                 </button>
                             </div>
                         </div>
@@ -226,39 +216,41 @@
                             <button onclick="toggleDropdown(event, 'qualityDropdown')" class="px-2 py-1.5 bg-[#2f2f35] rounded-full flex items-center justify-center active:bg-white/10 transition border border-white/5">
                                 <span id="qualityDisplay" class="text-[10px] font-bold text-slate-300">1K</span>
                             </button>
-                            <div id="qualityDropdown" class="hidden absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-24 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_20px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden z-[60] origin-bottom animate-in fade-in zoom-in-95 duration-100">
-                                <button onclick="setQuality('1K')" class="py-3 text-xs font-medium text-slate-200 hover:bg-white/5 active:bg-white/10 transition text-center border-b border-white/5">1K (标清)</button>
-                                <button onclick="setQuality('2K')" class="py-3 text-xs font-medium text-slate-200 hover:bg-white/5 active:bg-white/10 transition text-center border-b border-white/5">2K (高清)</button>
-                                <button onclick="setQuality('4K')" class="py-3 text-xs font-medium text-slate-200 hover:bg-white/5 active:bg-white/10 transition text-center">4K (超清)</button>
+                            <div id="qualityDropdown" class="hidden absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-24 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden z-[60] origin-bottom animate-in fade-in zoom-in-95">
+                                <button onclick="setQuality('1K')" class="py-3 text-xs text-slate-200 hover:bg-white/5 w-full border-b border-white/5">1K (标清)</button>
+                                <button onclick="setQuality('2K')" class="py-3 text-xs text-slate-200 hover:bg-white/5 w-full border-b border-white/5">2K (高清)</button>
+                                <button onclick="setQuality('4K')" class="py-3 text-xs text-slate-200 hover:bg-white/5 w-full">4K (超清)</button>
                             </div>
                         </div>
 
                         <!-- 批次 -->
                         <div class="relative">
-                            <button onclick="toggleDropdown(event, 'batchDropdown')" class="px-2 py-1.5 bg-[#2f2f35] rounded-full flex items-center justify-center active:bg-white/10 transition border border-white/5">
+                            <button onclick="toggleDropdown(event, 'batchDropdown')" class="px-2.5 py-1.5 bg-[#2f2f35] rounded-full flex items-center justify-center active:bg-white/10 transition border border-white/5">
                                 <span id="batchDisplay" class="text-[10px] font-medium text-slate-300">1张</span>
                             </button>
-                            <div id="batchDropdown" class="hidden absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-20 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_20px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden z-[60] origin-bottom animate-in fade-in zoom-in-95 duration-100">
-                                <button onclick="setBatch(1)" class="py-3 text-xs text-slate-200 border-b border-white/5">1张</button>
-                                <button onclick="setBatch(2)" class="py-3 text-xs text-slate-200 border-b border-white/5">2张</button>
-                                <button onclick="setBatch(4)" class="py-3 text-xs text-slate-200">4张</button>
+                            <div id="batchDropdown" class="hidden absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-20 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden z-[60] origin-bottom">
+                                <button onclick="setBatch(1)" class="py-3 text-xs text-slate-200 hover:bg-white/5 w-full border-b border-white/5">1张</button>
+                                <button onclick="setBatch(2)" class="py-3 text-xs text-slate-200 hover:bg-white/5 w-full border-b border-white/5">2张</button>
+                                <button onclick="setBatch(4)" class="py-3 text-xs text-slate-200 hover:bg-white/5 w-full">4张</button>
                             </div>
                         </div>
 
                         <!-- 比例 -->
                         <div class="relative">
-                            <button onclick="toggleDropdown(event, 'ratioDropdown')" class="px-2 py-1.5 bg-[#2f2f35] rounded-full flex items-center justify-center active:bg-white/10 transition border border-white/5">
+                            <button onclick="toggleDropdown(event, 'ratioDropdown')" class="px-2.5 py-1.5 bg-[#2f2f35] rounded-full flex items-center justify-center active:bg-white/10 transition border border-white/5">
                                 <span id="ratioDisplay" class="text-[10px] font-medium text-slate-300">自动</span>
                             </button>
-                            <div id="ratioDropdown" class="hidden absolute bottom-full mb-3 right-0 w-24 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_20px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden z-[60] origin-bottom-right animate-in fade-in zoom-in-95 duration-100">
-                                <button onclick="setRatio('auto')" class="py-2.5 text-xs text-slate-200 border-b border-white/5">自动</button>
-                                <button onclick="setRatio('1:1')" class="py-2.5 text-xs text-slate-200 border-b border-white/5">1:1</button>
-                                <button onclick="setRatio('3:2')" class="py-2.5 text-xs text-slate-200 border-b border-white/5">3:2</button>
-                                <button onclick="setRatio('16:9')" class="py-2.5 text-xs text-slate-200">16:9</button>
+                            <div id="ratioDropdown" class="hidden absolute bottom-full mb-3 right-0 w-24 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden z-[60] origin-bottom-right">
+                                <button onclick="setRatio('auto')" class="py-2.5 text-xs text-slate-200 hover:bg-white/5 w-full border-b border-white/5">自动</button>
+                                <button onclick="setRatio('1:1')" class="py-2.5 text-xs text-slate-200 hover:bg-white/5 w-full border-b border-white/5">1:1</button>
+                                <button onclick="setRatio('3:2')" class="py-2.5 text-xs text-slate-200 hover:bg-white/5 w-full border-b border-white/5">3:2</button>
+                                <button onclick="setRatio('2:3')" class="py-2.5 text-xs text-slate-200 hover:bg-white/5 w-full border-b border-white/5">2:3</button>
+                                <button onclick="setRatio('16:9')" class="py-2.5 text-xs text-slate-200 hover:bg-white/5 w-full border-b border-white/5">16:9</button>
+                                <button onclick="setRatio('9:16')" class="py-2.5 text-xs text-slate-200 hover:bg-white/5 w-full">9:16</button>
                             </div>
                         </div>
 
-                        <button onclick="generate()" class="w-9 h-9 bg-blue-600 active:bg-blue-700 rounded-full flex items-center justify-center transition-all active:scale-90 text-white shrink-0">
+                        <button onclick="generate()" class="w-10 h-10 bg-blue-600 active:bg-blue-700 rounded-full flex items-center justify-center transition-all active:scale-90 text-white shrink-0">
                             <i data-lucide="send" class="w-4 h-4 ml-0.5"></i>
                         </button>
                     </div>
@@ -274,40 +266,37 @@
                     <button onclick="toggleConfig()" class="text-slate-400"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
                 <div class="space-y-4">
-                    <input id="apiUrl" type="text" placeholder="API 地址" class="w-full bg-[#131315] border border-white/5 rounded-xl p-4 text-sm outline-none text-white">
+                    <input id="apiUrl" type="text" placeholder="API 地址 (例如 https://ai.xxx.com)" class="w-full bg-[#131315] border border-white/5 rounded-xl p-4 text-sm outline-none text-white">
                     <input id="apiKey" type="password" placeholder="API Key" class="w-full bg-[#131315] border border-white/5 rounded-xl p-4 text-sm outline-none text-white">
                     
-                    <!-- 【新增】：API 获取链接 -->
-                    <div class="px-1 flex justify-between items-center">
-                        <span class="text-[11px] text-slate-500">没有密钥？</span>
-                        <a href="https://ai.comfly.chat/register?aff=K4nM122020" target="_blank" class="text-[11px] text-blue-400 hover:underline flex items-center gap-1">
-                            点击此处获取 API Key <i data-lucide="external-link" class="w-3 h-3"></i>
+                    <div class="px-1 flex justify-between items-center bg-white/5 p-3 rounded-xl">
+                        <span class="text-[11px] text-slate-500 font-bold">获取渠道:</span>
+                        <a href="https://ai.comfly.chat/register?aff=K4nM122020" target="_blank" class="text-[11px] text-blue-400 font-bold hover:underline flex items-center gap-1">
+                            获取 API Key <i data-lucide="external-link" class="w-3 h-3"></i>
                         </a>
                     </div>
 
                     <div class="flex gap-2 pt-2">
-                        <button id="verifyBtn" onclick="verifyApiKey()" class="flex-1 flex justify-center items-center gap-2 bg-[#2a2a30] py-4 rounded-xl font-bold text-sm transition border border-white/5 active:scale-95">
-                            测试接口
-                        </button>
-                        <button onclick="saveConfig()" class="flex-1 bg-blue-600 py-4 rounded-xl font-bold text-sm active:scale-95 transition">
-                            保存配置
-                        </button>
+                        <button id="verifyBtn" onclick="verifyApiKey()" class="flex-1 flex justify-center items-center gap-2 bg-[#2a2a30] py-4 rounded-xl font-bold text-sm transition border border-white/5 active:scale-95">测试接口</button>
+                        <button onclick="saveConfig()" class="flex-1 bg-blue-600 py-4 rounded-xl font-bold text-sm active:scale-95 transition">保存配置</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="saveModal" class="hidden absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black/95 p-6 animate-in fade-in duration-200">
+        <!-- 保存弹窗 -->
+        <div id="saveModal" class="hidden absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black/95 p-6">
             <button onclick="closeSaveModal()" class="absolute top-[var(--safe-top)] right-6 p-3 bg-white/10 rounded-full text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
-            <div class="relative max-w-full max-h-[60dvh] bg-[#1e1e22] p-1 rounded-2xl shadow-2xl border border-white/10">
+            <div class="relative max-w-full max-h-[60dvh] bg-[#1e1e22] p-1 rounded-2xl shadow-2xl border border-white/10 mb-6">
                 <img id="savePreview" src="" class="max-w-full max-h-[55dvh] rounded-xl object-contain">
             </div>
-            <button onclick="window.open(document.getElementById('savePreview').src, '_blank')" class="mt-6 w-full max-w-xs flex items-center justify-center gap-2 py-4 bg-slate-800 text-slate-200 rounded-2xl font-bold active:scale-95 transition border border-white/10">
+            <button onclick="window.open(document.getElementById('savePreview').src, '_blank')" class="w-full max-w-xs flex items-center justify-center gap-2 py-4 bg-slate-800 text-slate-200 rounded-2xl font-bold active:scale-95 transition border border-white/10">
                 <i data-lucide="external-link" class="w-5 h-5"></i>
-                🌐 在新标签页打开原图 (可右键保存)
+                🌐 新标签页打开 (右键另存)
             </button>
         </div>
 
+        <!-- 历史预览 -->
         <div id="historyViewModal" class="hidden absolute inset-0 z-[120] flex flex-col items-center justify-center bg-black/95 p-4 animate-in fade-in duration-200">
             <button onclick="closeHistoryView()" class="absolute top-[var(--safe-top)] right-4 p-3 bg-white/10 rounded-full text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
             <img id="historyViewImg" src="" class="max-w-full max-h-[50dvh] rounded-2xl shadow-2xl mb-4 object-contain">
@@ -317,7 +306,7 @@
                     <button onclick="reuseHistoryPromptOnly()" class="flex-1 py-3 bg-[#2a2a30] text-slate-300 rounded-xl font-bold text-xs active:scale-95 transition">仅提取词</button>
                     <button id="reuseImageBtn" onclick="reuseHistoryImageOnly()" class="flex-1 py-3 bg-[#2a2a30] text-slate-300 rounded-xl font-bold text-xs active:scale-95 transition">作为参考图</button>
                 </div>
-                <button id="reuseAllBtn" onclick="reuseHistoryAll()" class="w-full py-3.5 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-500/20 active:scale-95 transition">完整套用</button>
+                <button id="reuseAllBtn" onclick="reuseHistoryAll()" class="w-full py-3.5 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg active:scale-95 transition">完整套用</button>
             </div>
         </div>
 
@@ -340,11 +329,11 @@
         let currentResultUrls = [];
         let progressInterval = null;
 
-        // 富文本编辑器逻辑
+        // 富文本编辑器
         function updatePlaceholder() {
             const el = document.getElementById('promptInput');
             const ph = document.getElementById('promptPlaceholder');
-            if (el.innerText.trim() === '') { ph.style.opacity = '1'; } else { ph.style.opacity = '0'; }
+            ph.style.opacity = el.innerText.trim() === '' ? '1' : '0';
         }
 
         function getPromptText() {
@@ -381,7 +370,7 @@
                 const rect = range.getBoundingClientRect();
                 const menu = document.getElementById('mentionMenu');
                 const containerRect = el.parentElement.getBoundingClientRect();
-                menu.style.left = Math.min(rect.left - containerRect.left, containerRect.width - 160) + 'px';
+                menu.style.left = Math.min(rect.left - containerRect.left, containerRect.width - 170) + 'px';
                 menu.style.bottom = (containerRect.bottom - rect.top + 8) + 'px';
                 showMentionMenu();
             } else { hideMentionMenu(); }
@@ -391,11 +380,11 @@
             const menu = document.getElementById('mentionMenu');
             menu.innerHTML = '';
             if (uploadedImagesBase64.length === 0) {
-                menu.innerHTML = `<div class="px-3 py-3 text-xs text-slate-500 text-center">无已传图片</div>`;
+                menu.innerHTML = `<div class="px-3 py-3 text-xs text-slate-500 text-center">需先上传图片</div>`;
             } else {
                 uploadedImagesBase64.forEach((_, idx) => {
                     const num = idx + 1;
-                    menu.innerHTML += `<button onclick="insertMention(${num})" class="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-slate-200 hover:bg-white/10 transition text-left border-b border-white/5 last:border-0"><div class="bg-blue-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">${num}</div>插入 @图片${num}</button>`;
+                    menu.innerHTML += `<button onclick="insertMention(${num})" class="w-full flex items-center gap-2 px-3 py-3 text-xs text-slate-200 hover:bg-white/10 transition border-b border-white/5 last:border-0 font-bold"><div class="bg-blue-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">${num}</div>插入 @图片${num}</button>`;
                 });
             }
             menu.classList.remove('hidden');
@@ -408,11 +397,10 @@
             if (!sel.rangeCount) return;
             const range = sel.getRangeAt(0);
             const textNode = range.startContainer;
-            const textBeforeCursor = textNode.textContent.substring(0, range.startOffset);
-            const match = textBeforeCursor.match(/(?:^|[\s\u00A0])@([^\s\u00A0]*)$/);
+            const replaceRange = document.createRange();
+            const match = textNode.textContent.substring(0, range.startOffset).match(/(?:^|[\s\u00A0])@([^\s\u00A0]*)$/);
             if (match) {
                 const startIndex = range.startOffset - match[0].length + match[0].indexOf('@');
-                const replaceRange = document.createRange();
                 replaceRange.setStart(textNode, startIndex);
                 replaceRange.setEnd(textNode, range.startOffset);
                 sel.removeAllRanges(); sel.addRange(replaceRange);
@@ -452,15 +440,16 @@
             try {
                 const res = await fetch(`${url}/v1/models`, { headers: { 'Authorization': `Bearer ${key}` } });
                 if (res.ok) { showToast("✅ 验证成功并保存"); localStorage.setItem('ai_base_url', url); localStorage.setItem('ai_api_key', key); }
-                else { showToast("❌ 密钥错误或不可用"); }
+                else { showToast("❌ 密钥不可用"); }
             } catch (e) { showToast("❌ 网络连接失败"); }
             finally { btn.disabled = false; btn.innerText = "测试接口"; }
         }
 
         function handleFiles(input) {
             const files = Array.from(input.files);
-            if (uploadedImagesBase64.length + files.length > MAX_UPLOADS) showToast(`⚠️ 最多允许 ${MAX_UPLOADS} 张图`);
-            files.slice(0, MAX_UPLOADS - uploadedImagesBase64.length).forEach(file => {
+            const canAdd = MAX_UPLOADS - uploadedImagesBase64.length;
+            if (files.length > canAdd) showToast(`⚠️ 还能上传 ${canAdd} 张图`);
+            files.slice(0, canAdd).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = (e) => { uploadedImagesBase64.push(e.target.result); renderUploadPreviews(); };
                 reader.readAsDataURL(file);
@@ -487,7 +476,7 @@
             if (uploadedImagesBase64.length === 0) { container.classList.add('hidden'); return; }
             container.classList.remove('hidden');
             uploadedImagesBase64.forEach((img, idx) => {
-                container.innerHTML += `<div class="relative inline-block animate-in fade-in slide-in-from-bottom-2"><div class="absolute -top-1.5 -left-1.5 bg-blue-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-white/20">${idx+1}</div><img src="${img}" class="w-12 h-12 object-cover rounded-lg border border-white/10"><button onclick="removeUpload(${idx})" class="absolute -top-1.5 -right-1.5 bg-[#3f3f46] rounded-full p-0.5"><i data-lucide="x" class="w-3 h-3"></i></button></div>`;
+                container.innerHTML += `<div class="relative inline-block animate-in fade-in zoom-in-75"><div class="absolute -top-1.5 -left-1.5 bg-blue-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-white/20">${idx+1}</div><img src="${img}" class="w-12 h-12 object-cover rounded-lg border border-white/10"><button onclick="removeUpload(${idx})" class="absolute -top-1.5 -right-1.5 bg-[#3f3f46] rounded-full p-0.5"><i data-lucide="x" class="w-3 h-3 text-white"></i></button></div>`;
             });
             lucide.createIcons();
         }
@@ -499,8 +488,8 @@
                 const div = document.createElement('div');
                 div.className = "break-inside-avoid inline-block w-full mb-2 rounded-xl border border-white/5 overflow-hidden active:scale-95 transition cursor-pointer relative group";
                 div.onclick = () => openHistoryView(item.url, item.prompt);
-                let displayPrompt = (item.prompt || '').replace(/@图片(\d+)/g, '<span class="bg-blue-600 px-1 rounded text-white font-bold">@图$1</span>');
-                div.innerHTML = `<img src="${item.url}" class="w-full object-cover"><div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition p-2 flex items-end"><p class="text-[9px] text-slate-200 line-clamp-2">${displayPrompt}</p></div>`;
+                let dp = (item.prompt || '').replace(/@图片(\d+)/g, '<span class="bg-blue-600 px-1 rounded text-white font-bold text-[8px]">@图$1</span>');
+                div.innerHTML = `<img src="${item.url}" class="w-full object-cover"><div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition p-2 flex items-end"><p class="text-[9px] text-slate-200 line-clamp-2">${dp}</p></div>`;
                 list.appendChild(div);
             });
         }
@@ -511,7 +500,7 @@
             const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('ai_api_key');
             if (!prompt) return showToast("请输入指令");
             if (!apiKey) return toggleConfig();
-            if (currentMode === 'edits' && uploadedImagesBase64.length === 0) return showToast("⚠️ 编辑模式需参考图");
+            if (currentMode === 'edits' && uploadedImagesBase64.length === 0) return showToast("⚠️ 编辑模式需上传原图");
 
             document.getElementById('promptInput').blur();
             document.getElementById('emptyState').classList.add('hidden');
@@ -520,46 +509,45 @@
             
             let p = 0;
             const bar = document.getElementById('progressBar');
-            const percent = document.getElementById('progressPercent');
+            const pct = document.getElementById('progressPercent');
             const log = document.getElementById('logText');
             progressInterval = setInterval(() => {
                 p += (p < 90 ? Math.random() * 5 : 0.1); if(p > 98) p = 98;
-                bar.style.width = p + '%'; percent.innerText = Math.floor(p) + '%';
-                log.innerText = p < 30 ? "连接服务器..." : p < 70 ? "解析指令与图像..." : "渲染细节中...";
+                bar.style.width = p + '%'; pct.innerText = Math.floor(p) + '%';
+                log.innerText = p < 30 ? "正在握手服务器..." : p < 70 ? "正在解析多图与指令..." : "正在完成最后渲染...";
             }, 800);
 
+            // 【补齐修复】：完整的分辨率映射表，严格遵守16的倍数
             const sizeMap = {
-                "1K": { "auto": "auto", "1:1": "1024x1024", "3:2": "1536x1024", "16:9": "1536x864" },
-                "2K": { "auto": "auto", "1:1": "2048x2048", "3:2": "2304x1536", "16:9": "2048x1152" },
-                "4K": { "auto": "auto", "1:1": "2880x2880", "3:2": "3456x2304", "16:9": "3840x2160" }
+                "1K": { "auto": "auto", "1:1": "1024x1024", "3:2": "1216x816",  "2:3": "816x1216",  "16:9": "1344x752",  "9:16": "752x1344" },
+                "2K": { "auto": "auto", "1:1": "2048x2048", "3:2": "2448x1632", "2:3": "1632x2448", "16:9": "2688x1520", "9:16": "1520x2688" },
+                "4K": { "auto": "auto", "1:1": "2880x2880", "3:2": "3488x2320", "2:3": "2320x3488", "16:9": "3840x2160", "9:16": "2160x3840" }
             };
-            const mappedSize = sizeMap[currentQuality]?.[currentRatio] || "1024x1024";
+            const mappedSize = sizeMap[currentQuality]?.[currentRatio] || "auto";
 
             try {
                 const endpoint = currentMode === 'edits' ? '/v1/images/edits' : '/v1/images/generations';
                 const makeRequest = async () => {
                     let options = { method: 'POST', headers: { 'Authorization': `Bearer ${apiKey}` } };
                     if (currentMode === 'edits') {
-                        const formData = new FormData();
-                        formData.append('model', currentModel);
-                        formData.append('prompt', prompt);
-                        formData.append('size', mappedSize);
-                        uploadedImagesBase64.forEach((b64, i) => formData.append('image', dataURLtoBlob(b64), `ref_${i}.png`));
-                        options.body = formData;
+                        const fd = new FormData();
+                        fd.append('model', currentModel); fd.append('prompt', prompt); fd.append('size', mappedSize);
+                        uploadedImagesBase64.forEach((b, i) => fd.append('image', dataURLtoBlob(b), `ref_${i}.png`));
+                        options.body = fd;
                     } else {
                         options.headers['Content-Type'] = 'application/json';
                         options.body = JSON.stringify({ model: currentModel, prompt, size: mappedSize, image: uploadedImagesBase64 });
                     }
                     const res = await fetch(`${baseUrl.replace(/\/$/, '')}${endpoint}`, options);
-                    const data = await res.json(); if (!res.ok) throw new Error(data.error?.message || "生成失败");
-                    return data;
+                    const dt = await res.json(); if (!res.ok) throw new Error(dt.error?.message || "生成失败");
+                    return dt;
                 };
 
                 const tasks = Array(currentBatch).fill(0).map(() => makeRequest());
                 const results = await Promise.all(tasks);
                 const urls = results.flatMap(r => r.data?.map(d => d.url) || [r.url]).filter(Boolean);
 
-                clearInterval(progressInterval); bar.style.width = '100%'; percent.innerText = '100%';
+                clearInterval(progressInterval); bar.style.width = '100%'; pct.innerText = '100%';
                 currentResultUrls = urls;
                 const grid = document.getElementById('mainResultGrid'); grid.innerHTML = '';
                 urls.forEach(u => {
@@ -574,10 +562,8 @@
                     document.getElementById('saveBtnText').innerText = urls.length > 1 ? `保存全部(${urls.length})` : "保存画作";
                 }, 400);
 
-                urls.forEach(u => {
-                    historyQueue.unshift({ url: u, prompt, id: Date.now() });
-                    if(historyQueue.length > 30) historyQueue.pop();
-                });
+                urls.forEach(u => historyQueue.unshift({ url: u, prompt, id: Date.now() }));
+                if(historyQueue.length > 30) historyQueue = historyQueue.slice(0, 30);
                 localStorage.setItem('ai_history', JSON.stringify(historyQueue)); renderHistory();
 
             } catch (err) {
@@ -587,43 +573,50 @@
             }
         }
 
-        function dataURLtoBlob(dataurl) {
-            let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-                bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-            while(n--) u8arr[n] = bstr.charCodeAt(n);
-            return new Blob([u8arr], {type:mime});
+        function dataURLtoBlob(du) {
+            let arr = du.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(arr[1]), n = bstr.length, u8 = new Uint8Array(n);
+            while(n--) u8[n] = bstr.charCodeAt(n);
+            return new Blob([u8], {type:mime});
         }
 
         function saveCurrentState() { localStorage.setItem('ai_last_prompt', getPromptText()); }
         function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.remove('-translate-y-20', 'opacity-0'); setTimeout(() => t.classList.add('-translate-y-20', 'opacity-0'), 3000); }
-        function saveConfig() { localStorage.setItem('ai_base_url', document.getElementById('apiUrl').value.trim()); localStorage.setItem('ai_api_key', document.getElementById('apiKey').value.trim()); toggleConfig(); showToast("✅ 配置已保存"); }
+        function saveConfig() { localStorage.setItem('ai_base_url', document.getElementById('apiUrl').value.trim()); localStorage.setItem('ai_api_key', document.getElementById('apiKey').value.trim()); toggleConfig(); showToast("✅ 配置成功"); }
         function toggleConfig() { document.getElementById('configModal').classList.toggle('hidden'); }
         function toggleSidebar(id) { document.getElementById(id).classList.toggle('translate-x-full'); document.getElementById('sidebarOverlay').classList.toggle('hidden'); setTimeout(() => document.getElementById('sidebarOverlay').classList.toggle('opacity-100'), 10); }
         function closeAllSidebars() { document.getElementById('historySidebar').classList.add('translate-x-full'); document.getElementById('sidebarOverlay').classList.add('hidden'); document.getElementById('sidebarOverlay').classList.remove('opacity-100'); }
         function closeCanvas() { document.getElementById('resultContainer').classList.add('hidden'); document.getElementById('emptyState').classList.remove('hidden'); currentResultUrls = []; }
-        function setMode(v) { currentMode = v; document.getElementById('modeDisplay').innerText = v === 'generations' ? '生成模式' : '编辑模式'; closeAllDropdowns(); }
+        function setMode(v) { currentMode = v; document.getElementById('modeDisplay').innerText = v === 'generations' ? '生成' : '编辑'; closeAllDropdowns(); }
         function setBatch(v) { currentBatch = v; document.getElementById('batchDisplay').innerText = v + '张'; closeAllDropdowns(); }
         function setRatio(v) { currentRatio = v; document.getElementById('ratioDisplay').innerText = v === 'auto' ? '自动' : v; closeAllDropdowns(); }
         function setQuality(v) { currentQuality = v; document.getElementById('qualityDisplay').innerText = v; closeAllDropdowns(); }
         function openSaveModal() { if(!currentResultUrls.length) return; document.getElementById('savePreview').src = currentResultUrls[0]; document.getElementById('saveModal').classList.remove('hidden'); }
         function closeSaveModal() { document.getElementById('saveModal').classList.add('hidden'); }
-        function openHistoryView(u, p) { document.getElementById('historyViewImg').src = u; document.getElementById('historyViewPrompt').innerText = p || '无描述'; currentHistoryPromptStr = p; document.getElementById('historyViewModal').classList.remove('hidden'); }
+        function openHistoryView(u, p) { document.getElementById('historyViewImg').src = u; currentHistoryPromptStr = p;
+            let hp = (p || '无描述').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/@图片(\d+)/g, '<span class="mention-tag bg-slate-700 pointer-events-none">@图片$1</span>');
+            document.getElementById('historyViewPrompt').innerHTML = hp;
+            document.getElementById('historyViewModal').classList.remove('hidden');
+        }
         function closeHistoryView() { document.getElementById('historyViewModal').classList.add('hidden'); }
         function reuseHistoryPromptOnly() { setPromptHtml(currentHistoryPromptStr); closeHistoryView(); closeAllSidebars(); }
-        function clearHistory() { if(confirm("清除历史？")) { historyQueue = []; localStorage.removeItem('ai_history'); renderHistory(); } }
+        async function reuseHistoryImageOnly() { try { const b64 = await fetchImageAsBase64(document.getElementById('historyViewImg').src); uploadedImagesBase64 = [b64]; renderUploadPreviews(); closeHistoryView(); closeAllSidebars(); showToast("已设为参考图"); } catch(e) { showToast("跨域限制，请手动上传"); } }
+        async function reuseHistoryAll() { setPromptHtml(currentHistoryPromptStr); await reuseHistoryImageOnly(); }
+        function startCompare() { if(uploadedImagesBase64.length===1 && currentResultUrls.length===1) { document.getElementById('compareImg').src = uploadedImagesBase64[0]; document.getElementById('compareOverlay').classList.replace('opacity-0', 'opacity-100'); } }
+        function stopCompare() { document.getElementById('compareOverlay').classList.replace('opacity-100', 'opacity-0'); }
+        function clearHistory() { if(confirm("确定清空？")) { historyQueue=[]; localStorage.removeItem('ai_history'); renderHistory(); } }
 
         window.onload = () => {
             const url = localStorage.getItem('ai_base_url') || 'https://ai.comfly.chat';
             const key = localStorage.getItem('ai_api_key');
-            const prompt = localStorage.getItem('ai_last_prompt');
-            const history = localStorage.getItem('ai_history');
-            const model = localStorage.getItem('ai_last_model') || 'gpt-image-2';
-            
+            const pr = localStorage.getItem('ai_last_prompt');
+            const hi = localStorage.getItem('ai_history');
+            const md = localStorage.getItem('ai_last_model') || 'gpt-image-2';
             document.getElementById('apiUrl').value = url;
             if(key) document.getElementById('apiKey').value = key;
-            if(prompt) setPromptHtml(prompt);
-            if(history) { historyQueue = JSON.parse(history); renderHistory(); }
-            setGlobalModel(model);
+            if(pr) setPromptHtml(pr);
+            if(hi) { historyQueue = JSON.parse(hi); renderHistory(); }
+            setGlobalModel(md);
             if(!key) toggleConfig();
         };
     </script>
