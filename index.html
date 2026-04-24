@@ -83,7 +83,6 @@
         <input type="file" id="globalFileInput" class="hidden" accept="image/*" multiple onchange="handleFiles(this)">
         <div id="dropdownOverlay" onclick="closeAllDropdowns()" class="hidden absolute inset-0 z-40"></div>
 
-        <!-- 导航栏 -->
         <header class="header-bg border-b border-white/5 shrink-0 z-40">
             <div class="h-14 flex items-center justify-between px-4">
                 <div class="flex items-center gap-2">
@@ -109,14 +108,12 @@
         <main class="flex-1 flex flex-col overflow-hidden relative">
             <div id="sidebarOverlay" onclick="closeAllSidebars()" class="hidden absolute inset-0 bg-black/80 backdrop-blur-md z-[55] transition-opacity opacity-0"></div>
 
-            <!-- 画布中心 -->
             <div class="flex-1 flex flex-col p-4 relative overflow-hidden">
                 <div id="emptyState" class="m-auto flex flex-col items-center opacity-20 pointer-events-none text-center">
                     <i data-lucide="ghost" class="w-16 h-16 mb-4"></i>
                     <p class="text-[10px] font-bold uppercase tracking-[0.2em]">等待灵感降临</p>
                 </div>
 
-                <!-- 进度条 -->
                 <div id="loadingState" class="hidden m-auto flex flex-col items-center w-full max-w-xs px-2 text-center animate-in fade-in">
                     <div class="relative w-14 h-14 mb-6">
                         <div class="absolute inset-0 border-4 border-blue-500/20 rounded-full"></div>
@@ -159,7 +156,6 @@
                 </div>
             </div>
 
-            <!-- 侧边栏 -->
             <aside id="historySidebar" class="absolute inset-y-0 right-0 w-[280px] bg-[#131315] z-[60] transition-transform translate-x-full border-l border-white/10 flex flex-col shadow-2xl">
                 <div class="pt-[calc(var(--safe-top)+1rem)] px-4 pb-4 border-b border-white/5 flex justify-between items-center bg-white/5">
                     <button onclick="closeAllSidebars()" class="p-2 text-slate-400 active:text-white rounded-lg"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
@@ -170,7 +166,6 @@
             </aside>
         </main>
 
-        <!-- 底部控制 -->
         <div class="safe-bottom bg-[#131315] px-3 py-2 w-full shrink-0 z-50 pb-[calc(var(--safe-bottom)+1.25rem)]">
             <div class="bg-[#202024] rounded-3xl p-2.5 flex flex-col transition-all border border-white/5 shadow-sm">
                 
@@ -203,7 +198,6 @@
                     </div>
 
                     <div class="flex items-center gap-1 overflow-visible">
-                        <!-- 模式 -->
                         <div class="relative">
                             <button onclick="toggleDropdown(event, 'modeDropdown')" class="px-2.5 py-1.5 bg-[#2f2f35] rounded-full flex items-center justify-center border border-white/5">
                                 <span id="modeDisplayLabel" class="text-[10px] font-medium text-slate-300">生成</span>
@@ -221,7 +215,6 @@
                             </div>
                         </div>
 
-                        <!-- 质量 -->
                         <div class="relative">
                             <button onclick="toggleDropdown(event, 'qualityDropdown')" class="px-2 py-1.5 bg-[#2f2f35] rounded-full flex items-center justify-center border border-white/5">
                                 <span id="qualityDisplayLabel" class="text-[10px] font-bold text-slate-300">1K</span>
@@ -233,7 +226,6 @@
                             </div>
                         </div>
 
-                        <!-- 批次 -->
                         <div class="relative">
                             <button onclick="toggleDropdown(event, 'batchDropdown')" class="px-2.5 py-1.5 bg-[#2f2f35] rounded-full flex items-center justify-center border border-white/5">
                                 <span id="batchDisplayLabel" class="text-[10px] font-medium text-slate-300">1张</span>
@@ -245,20 +237,21 @@
                             </div>
                         </div>
 
-                        <!-- 比例 -->
                         <div class="relative">
                             <button onclick="toggleDropdown(event, 'ratioDropdown')" class="px-2.5 py-1.5 bg-[#2f2f35] rounded-full flex items-center justify-center border border-white/5">
                                 <span id="ratioDisplayLabel" class="text-[10px] font-medium text-slate-300">自动</span>
                             </button>
-                            <div id="ratioDropdown" class="hidden absolute bottom-full mb-3 right-0 w-32 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden z-[60] origin-bottom-right">
+                            <div id="ratioDropdown" class="hidden absolute bottom-full mb-3 right-0 w-40 bg-[#2a2a30]/95 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden z-[60] origin-bottom-right">
                                 <button onclick="setRatio('auto')" class="py-3 text-xs text-slate-200 hover:bg-white/5 w-full border-b border-white/5 font-bold">自动识别</button>
                                 <div class="grid grid-cols-2">
                                     <button onclick="setRatio('1:1')" class="py-3 text-xs text-slate-200 hover:bg-white/5 border-r border-b border-white/5">1:1</button>
                                     <button onclick="setRatio('16:9')" class="py-3 text-xs text-slate-200 hover:bg-white/5 border-b border-white/5">16:9</button>
                                     <button onclick="setRatio('3:2')" class="py-3 text-xs text-slate-200 hover:bg-white/5 border-r border-b border-white/5">3:2</button>
                                     <button onclick="setRatio('2:3')" class="py-3 text-xs text-slate-200 hover:bg-white/5 border-b border-white/5 font-bold text-blue-400">2:3</button>
-                                    <button onclick="setRatio('4:3')" class="py-3 text-xs text-slate-200 hover:bg-white/5 border-r border-white/5">4:3</button>
-                                    <button onclick="setRatio('9:16')" class="py-3 text-xs text-slate-200 hover:bg-white/5 font-bold text-blue-400">9:16</button>
+                                    <button onclick="setRatio('4:3')" class="py-3 text-xs text-slate-200 hover:bg-white/5 border-r border-b border-white/5">4:3</button>
+                                    <button onclick="setRatio('9:16')" class="py-3 text-xs text-slate-200 hover:bg-white/5 border-b border-white/5 font-bold text-blue-400">9:16</button>
+                                    <button onclick="setRatio('21:9')" class="py-3 text-xs text-blue-400 hover:bg-white/5 border-r border-white/5 font-bold">21:9</button>
+                                    <button class="py-3 text-xs text-slate-600 cursor-default"></button>
                                 </div>
                             </div>
                         </div>
@@ -271,7 +264,6 @@
             </div>
         </div>
 
-        <!-- 模态框：设置 -->
         <div id="configModal" class="hidden absolute inset-0 z-[100] flex items-center justify-center bg-black/95 p-6">
             <div class="w-full max-w-sm bg-[#1e1e22] border border-white/10 rounded-3xl p-6 shadow-2xl animate-in zoom-in-95">
                 <div class="flex justify-between items-center mb-6">
@@ -297,19 +289,17 @@
             </div>
         </div>
 
-        <!-- 模态框：保存 -->
         <div id="saveModal" class="hidden absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black/95 p-6 animate-in fade-in">
             <button onclick="closeSaveModal()" class="absolute top-[var(--safe-top)] right-6 p-3 bg-white/10 rounded-full text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
             <div class="relative max-w-full max-h-[60dvh] bg-[#1e1e22] p-1 rounded-2xl shadow-2xl border border-white/10 mb-6">
                 <img id="savePreview" src="" class="max-w-full max-h-[55dvh] rounded-xl object-contain">
             </div>
-            <button onclick="window.open(document.getElementById('savePreview').src, '_blank')" class="w-full max-w-xs flex items-center justify-center gap-2 py-4 bg-slate-800 text-slate-200 rounded-2xl font-bold active:scale-95 transition border border-white/10">
-                <i data-lucide="external-link" class="w-5 h-5"></i>
-                🌐 在新标签页打开原图 (保存无忧)
+            <button onclick="downloadImage()" class="w-full max-w-xs flex items-center justify-center gap-2 py-4 bg-slate-800 text-slate-200 rounded-2xl font-bold active:scale-95 transition border border-white/10">
+                <i data-lucide="download" class="w-5 h-5"></i>
+                📥 直接保存到相册/文件夹
             </button>
         </div>
 
-        <!-- 模态框：历史详情 -->
         <div id="historyViewModal" class="hidden absolute inset-0 z-[120] flex flex-col items-center justify-center bg-black/95 p-4 animate-in fade-in">
             <button onclick="closeHistoryView()" class="absolute top-[var(--safe-top)] right-4 p-3 bg-white/10 rounded-full text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
             <img id="historyViewImg" src="" class="max-w-full max-h-[50dvh] rounded-2xl shadow-2xl mb-4 object-contain">
@@ -565,13 +555,31 @@
                 log.innerText = p < 30 ? "握手服务器..." : p < 70 ? "解析指令与图像矩阵..." : "正在渲染最终画质...";
             }, 800);
 
-            // 分辨率映射 (严格16倍数)
+            // 分辨率映射：包含带鱼屏 21:9，并且对所有的模型放开限制
             const sizeMap = {
-                "1K": { "auto": "auto", "1:1": "1024x1024", "3:2": "1216x816",  "2:3": "816x1216",  "16:9": "1344x752",  "9:16": "752x1344", "4:3": "1152x864" },
-                "2K": { "auto": "auto", "1:1": "2048x2048", "3:2": "2448x1632", "2:3": "1632x2448", "16:9": "2688x1520", "9:16": "1520x2688", "4:3": "2304x1728" },
-                "4K": { "auto": "auto", "1:1": "2880x2880", "3:2": "3488x2320", "2:3": "2320x3488", "16:9": "3840x2160", "9:16": "2160x3840", "4:3": "3840x2880" }
+                "1K": { 
+                    "auto": "1024x1024", "1:1": "1024x1024", 
+                    "3:2": "1216x816",  "2:3": "816x1216",  
+                    "16:9": "1344x752",  "9:16": "752x1344", 
+                    "4:3": "1152x864", 
+                    "21:9": "1680x720"   // 1K 带鱼屏
+                },
+                "2K": { 
+                    "auto": "2048x2048", "1:1": "2048x2048", 
+                    "3:2": "2448x1632", "2:3": "1632x2448", 
+                    "16:9": "2688x1520", "9:16": "1520x2688", 
+                    "4:3": "2304x1728", 
+                    "21:9": "2560x1088"  // 2K 带鱼屏
+                },
+                "4K": { 
+                    "auto": "2880x2880", "1:1": "2880x2880", 
+                    "3:2": "3488x2320", "2:3": "2320x3488", 
+                    "16:9": "3840x2160", "9:16": "2160x3840", 
+                    "4:3": "3840x2880", 
+                    "21:9": "3840x1632"  // 4K 带鱼屏
+                }
             };
-            const mappedSize = sizeMap[currentQuality]?.[currentRatio] || "auto";
+            const mappedSize = sizeMap[currentQuality]?.[currentRatio] || "1024x1024";
 
             try {
                 const endpoint = currentMode === 'edits' ? '/v1/images/edits' : '/v1/images/generations';
@@ -582,7 +590,7 @@
                         fd.append('model', currentModel); 
                         fd.append('prompt', prompt); 
                         fd.append('size', mappedSize);
-                        fd.append('response_format', 'url'); // 必填参数修复
+                        fd.append('response_format', 'url'); 
                         uploadedImagesBase64.forEach((b, i) => fd.append('image', dataURLtoBlob(b), `ref_${i}.png`));
                         options.body = fd;
                     } else {
@@ -592,7 +600,7 @@
                             prompt, 
                             size: mappedSize, 
                             image: uploadedImagesBase64,
-                            response_format: 'url' // 必填参数修复
+                            response_format: 'url' 
                         });
                     }
                     const res = await fetch(`${baseUrl.replace(/\/$/, '')}${endpoint}`, options);
@@ -668,6 +676,32 @@
         function startCompare() { if(uploadedImagesBase64.length===1 && currentResultUrls.length===1) { document.getElementById('compareImg').src = uploadedImagesBase64[0]; document.getElementById('compareOverlay').classList.replace('opacity-0', 'opacity-100'); } }
         function stopCompare() { document.getElementById('compareOverlay').classList.replace('opacity-100', 'opacity-0'); }
         function clearHistory() { if(confirm("确定清空所有历史记录？")) { historyQueue=[]; localStorage.removeItem('ai_history'); renderHistory(); } }
+
+        // 修复跨域下载功能
+        async function downloadImage() {
+            const imgUrl = document.getElementById('savePreview').src;
+            if (!imgUrl) return;
+
+            try {
+                showToast("正在准备下载...");
+                
+                // 使用 fetch 将远端图片取到本地转成 Blob，规避空白页拦截
+                const response = await fetch(imgUrl);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `AI_Studio_Gen_${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } catch (e) {
+                // 万一被最严格的 CORS 策略拦截，降级尝试新窗口打开
+                window.open(imgUrl, '_blank');
+            }
+        }
 
         window.onload = () => {
             const url = localStorage.getItem('ai_base_url') || 'https://ai.comfly.chat';
